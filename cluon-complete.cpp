@@ -1,1 +1,0 @@
-/home/mattias/openkorp-logic-dronestate/cluon-complete.hpp

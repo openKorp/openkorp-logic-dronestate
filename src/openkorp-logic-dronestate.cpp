@@ -17,7 +17,7 @@
 
 #include "cluon-complete.hpp"
 #include "opendlv-standard-message-set.hpp"
-#include "Ps3Controller.h"
+// #include "Ps3Controller.h"
 #include <ncurses.h>
 #include "openkorp-message-set.hpp"
 
@@ -31,8 +31,8 @@ int32_t main(int32_t argc, char **argv) {
     std::cerr << "Usage:   " << argv[0] << " --cid=<OpenDaVINCI session> [--verbose] --input=<js node>" << std::endl;
     std::cerr << "Example: " << argv[0] << " --cid=111 --input=/dev/input/js0" << std::endl;
     retCode = 1;
-    Ps3Controller ps3controller();
   } else {
+    // Ps3Controller ps3controller();
     int32_t VERBOSE{commandlineArguments.count("verbose") != 0};
     cluon::OD4Session od4{static_cast<uint16_t>(std::stoi(commandlineArguments["cid"])),
       [](auto){}
@@ -41,49 +41,48 @@ int32_t main(int32_t argc, char **argv) {
       VERBOSE = std::stoi(commandlineArguments["verbose"]);
     }
     float const FREQ = std::stof(commandlineArguments["freq"]);
-    Ps3Controller ps3controller(commandlineArguments["input"]);
+    // Ps3Controller ps3controller(commandlineArguments["input"]);
     if (VERBOSE == 2) {
       initscr();
     }
 
-    auto atFrequency{[&ps3controller, &VERBOSE, &od4]() -> bool
+    auto atFrequency{[
+      // &ps3controller,
+       &VERBOSE, &od4]() -> bool
     {
-      ps3controller.readPs3Controller();
-      openkorp::logic::StateRequest ps3StateReq = ps3controller.getStateRequest();
-      double baseThrust = ps3StateReq.baseThrust();
-      double yawSpeed  = ps3StateReq.yawSpeed();
-      double roll  = ps3StateReq.roll();
-      double pitch  = ps3StateReq.pitch();
-      double pitchTrim  = ps3StateReq.pitchTrim();
-      double rollTrim  = ps3StateReq.rollTrim();
+      // ps3controller.readPs3Controller();
+      // openkorp::logic::StateRequest ps3StateReq = ps3controller.getStateRequest();
+      // double baseThrust = ps3StateReq.baseThrust();
+      // double yawSpeed  = ps3StateReq.yawSpeed();
+      // double roll  = ps3StateReq.roll();
+      // double pitch  = ps3StateReq.pitch();
+      // double pitchTrim  = ps3StateReq.pitchTrim();
+      // double rollTrim  = ps3StateReq.rollTrim();
 
-      if (VERBOSE == 1) {
-        std::cout 
-            << ps3controller.toString() << std::endl
-            << "baseThrust: " + std::to_string(baseThrust) << std::endl
-            << "yawSpeed: " + std::to_string(yawSpeed) << std::endl
-            << "roll: " + std::to_string(roll) << std::endl
-            << "pitch: " + std::to_string(pitch) << std::endl
-            << "pitchTrim: " + std::to_string(pitchTrim) << std::endl
-            << "rollTrim: " + std::to_string(rollTrim) << std::endl;
-      }
+      // if (VERBOSE == 1) {
+      //   std::cout 
+      //       << ps3controller.toString() << std::endl
+      //       << "baseThrust: " + std::to_string(baseThrust) << std::endl
+      //       << "yawSpeed: " + std::to_string(yawSpeed) << std::endl
+      //       << "roll: " + std::to_string(roll) << std::endl
+      //       << "pitch: " + std::to_string(pitch) << std::endl
+      //       << "pitchTrim: " + std::to_string(pitchTrim) << std::endl
+      //       << "rollTrim: " + std::to_string(rollTrim) << std::endl;
+      // }
       if (VERBOSE == 2) {
-        mvprintw(1,1,(ps3controller.toString()).c_str()); 
-        mvprintw(1,40,(std::to_string(baseThrust)).c_str()); 
-        mvprintw(20,40,(std::to_string(rollTrim)).c_str()); 
+        // mvprintw(1,1,(ps3controller.toString()).c_str()); 
+        // mvprintw(1,40,(std::to_string(baseThrust)).c_str()); 
+        // mvprintw(20,40,(std::to_string(rollTrim)).c_str()); 
         refresh();   
       }
       cluon::data::TimeStamp sampleTime = cluon::time::now();
 
-      od4.send(ps3StateReq, sampleTime, 0);
+      // od4.send(ps3StateReq, sampleTime, 0);
       return true;
     }};
 
     od4.timeTrigger(FREQ, atFrequency);
 
-    while (od4.isRunning()) {
-      std::this_thread::sleep_for(std::chrono::duration<double>(1.0));
-    }
   }
   return retCode;
 }

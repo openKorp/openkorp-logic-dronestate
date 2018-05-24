@@ -59,20 +59,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 find_program(FOUND_CLUON cluon-msc)
-################################################################################
-# Eigen
-find_package(Eigen3 3.3 REQUIRED NO_MODULE)
-include_directories(${Eigen3_INCLUDE_DIRS})
 
-###
-# Add custom libs here
-set(LIBRARIES {Eigen3_LIBS})
-SET( EIGEN3_INCLUDE_DIR "$ENV{EIGEN3_INCLUDE_DIR}" )
 
-IF( NOT EIGEN3_INCLUDE_DIR )
-    MESSAGE( FATAL_ERROR "Please point the environment variable EIGEN3_INCLUDE_DIR to the include directory of your Eigen3 installation.")
-ENDIF()
-INCLUDE_DIRECTORIES ( "${EIGEN3_INCLUDE_DIR}" )
+
 ################################################################################
 # Find installed libcluon
 if(FOUND_CLUON)
@@ -116,6 +105,11 @@ include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 
 ################################################################################
+# Eigen
+find_package(Eigen3 REQUIRED )
+include_directories(${Eigen3_INCLUDE_DIRS})
+
+################################################################################
 # Find ncurse
 find_package( Curses REQUIRED )
 include_directories( ${CURSES_INCLUDE_DIRS} )
@@ -123,7 +117,7 @@ include_directories( ${CURSES_INCLUDE_DIRS} )
 ################################################################################
 # Gather all object code first to avoid double compilation.
 add_library(${PROJECT_NAME}-core OBJECT  ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.cpp ${CMAKE_BINARY_DIR}/openkorp-message-set.cpp src/DroneState.cpp)
-set(LIBRARIES Threads::Threads ${CURSES_LIBRARIES})
+set(LIBRARIES Threads::Threads ${CURSES_LIBRARIES} ${Eigen3_LIBS})
 
 ################################################################################
 # Create executable.

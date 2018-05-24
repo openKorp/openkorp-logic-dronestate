@@ -23,62 +23,62 @@
 #include <map>
 #include <vector>
 #include <memory>
-#include <Eigen/Dense>
+#include <eigen3/Eigen/Dense>
 #include <string>
 
-#include <opendavinci/odcore/base/Mutex.h>
-#include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
+// #include <opendavinci/odcore/base/Mutex.h>
+// #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>
 
-#include <opendavinci/odcore/data/Container.h>
-#include <odvdimu/GeneratedHeaders_ODVDIMU.h>
+// #include <opendavinci/odcore/data/Container.h>
+// #include <odvdimu/GeneratedHeaders_ODVDIMU.h>
 
-namespace opendlv {
-namespace logic {
-namespace miniature {
+// namespace opendlv {
+// namespace logic {
+// namespace miniature {
 
-class DroneState : 
-  public odcore::base::module::TimeTriggeredConferenceClientModule {
- public:
-  DroneState(const int &, char **);
-  DroneState(const DroneState &) = delete;
-  DroneState &operator=(const DroneState &) = delete;
-  virtual ~DroneState();
-  virtual void nextContainer(odcore::data::Container &);
+// class DroneState : 
+//   public odcore::base::module::TimeTriggeredConferenceClientModule {
+//  public:
+//   DroneState(const int &, char **);
+//   DroneState(const DroneState &) = delete;
+//   DroneState &operator=(const DroneState &) = delete;
+//   virtual ~DroneState();
+//   virtual void nextContainer(odcore::data::Container &);
 
- private:
-  void setUp();
-  void tearDown();
-  virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
+//  private:
+//   void setUp();
+//   void tearDown();
+//   virtual odcore::data::dmcp::ModuleExitCodeMessage::ModuleExitCode body();
 
-  void RemoveOldData();
-  int8_t saveApaCalibrationFile();
-  int8_t loadApaCalibrationFile();
-  Eigen::Vector3f GetAircraftPrincipalAxesValues(Eigen::Vector3f) const;
-  Eigen::Vector3f GetAccelerationLatest();
-  Eigen::Vector3f GetAccelerationAvg();
-  Eigen::Vector3f GetMagneticfieldLatest();
-  Eigen::Vector3f GetMagneticfieldAvg();
-  Eigen::Vector3f GetAngularVelocityLatest();
-  Eigen::Vector3f GetAngularVelocityAvg();
-  float GetTemperatureLatest();
-  float GetTemperatureAvg();
-  float GetAltitudeLatest();
-  float GetAltitudeAvg();
+//   void RemoveOldData();
+//   int8_t saveApaCalibrationFile();
+//   int8_t loadApaCalibrationFile();
+//   Eigen::Vector3f GetAircraftPrincipalAxesValues(Eigen::Vector3f) const;
+//   Eigen::Vector3f GetAccelerationLatest();
+//   Eigen::Vector3f GetAccelerationAvg();
+//   Eigen::Vector3f GetMagneticfieldLatest();
+//   Eigen::Vector3f GetMagneticfieldAvg();
+//   Eigen::Vector3f GetAngularVelocityLatest();
+//   Eigen::Vector3f GetAngularVelocityAvg();
+//   float GetTemperatureLatest();
+//   float GetTemperatureAvg();
+//   float GetAltitudeLatest();
+//   float GetAltitudeAvg();
 
-  bool m_initialised;
-  odcore::base::Mutex m_mutex;
-  float m_memoryTime;
-  Eigen::Vector3f m_apaTrim;
-  std::string const m_calibrationFile;
-  std::map<int32_t, std::vector<odcore::data::Container>> m_accelerometerReadings;
-  std::map<int32_t, std::vector<odcore::data::Container>> m_magnetometerReadings;
-  std::map<int32_t, std::vector<odcore::data::Container>> m_gyroscopeReadings;
-  std::map<int32_t, std::vector<odcore::data::Container>> m_altimeterReadings;
-  std::map<int32_t, std::vector<odcore::data::Container>> m_temperatureReadings;
-};
+//   bool m_initialised;
+//   odcore::base::Mutex m_mutex;
+//   float m_memoryTime;
+//   Eigen::Vector3f m_apaTrim;
+//   std::string const m_calibrationFile;
+//   std::map<int32_t, std::vector<odcore::data::Container>> m_accelerometerReadings;
+//   std::map<int32_t, std::vector<odcore::data::Container>> m_magnetometerReadings;
+//   std::map<int32_t, std::vector<odcore::data::Container>> m_gyroscopeReadings;
+//   std::map<int32_t, std::vector<odcore::data::Container>> m_altimeterReadings;
+//   std::map<int32_t, std::vector<odcore::data::Container>> m_temperatureReadings;
+// };
 
-}
-}
-}
+// }
+// }
+// }
 
 #endif
