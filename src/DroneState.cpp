@@ -23,17 +23,7 @@
 #include <fstream>
 #include <cmath>
 
-#include <opendavinci/odcore/base/KeyValueConfiguration.h>
-#include <opendavinci/odcore/base/Lock.h>
-#include <opendavinci/odcore/data/TimeStamp.h>
-// #include <opendavinci/odcore/strings/StringToolbox.h>
-#include <opendavinci/generated/odcockpit/SimplePlot.h>
-#include <opendavinci/generated/odcockpit/RuntimeConfiguration.h>
-
-
-
-#include <odvdminiature/GeneratedHeaders_ODVDMiniature.h>
-#include <odvdimu/GeneratedHeaders_ODVDIMU.h>
+#include "openkorp-message-set.hpp"
 
 #include "DroneState.h"
 
