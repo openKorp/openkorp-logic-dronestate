@@ -20,11 +20,11 @@
 #ifndef LOGIC_MINIATURE_DRONESTATE_H
 #define LOGIC_MINIATURE_DRONESTATE_H
 
-#include <map>
-#include <vector>
-#include <memory>
-#include <eigen3/Eigen/Dense>
-#include <string>
+// #include <map>
+// #include <vector>
+// #include <memory>
+// #include <eigen3/Eigen/Dense>
+// #include <string>
 
 // #include <opendavinci/odcore/base/Mutex.h>
 // #include <opendavinci/odcore/base/module/TimeTriggeredConferenceClientModule.h>

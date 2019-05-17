@@ -18,7 +18,7 @@ if(CCACHE_FOUND)
     set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK ccache)
 endif(CCACHE_FOUND)
 
-cmake_minimum_required(VERSION 3.2)
+cmake_minimum_required(VERSION 3.10)
 
 project(openkorp-logic-dronestate)
 
@@ -26,7 +26,7 @@ project(openkorp-logic-dronestate)
 # Defining the relevant versions of OpenDLV Standard Message Set and libcluon.
 set(OPENDLV_STANDARD_MESSAGE_SET opendlv-standard-message-set.odvd)
 set(OPENKORP_MESSAGE_SET openkorp-message-set.odvd)
-set(CLUON_COMPLETE cluon-complete-v0.0.98.hpp)
+set(CLUON_COMPLETE cluon-complete-v0.0.121.hpp)
 
 
 ################################################################################
@@ -58,72 +58,78 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} \
 # Threads are necessary for linking the resulting binaries as UDPReceiver is running in parallel.
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
-find_program(FOUND_CLUON cluon-msc)
+set(LIBRARIES Threads::Threads)
 
-
+find_program(CLUON_CMD cluon-msc)
 
 ################################################################################
 # Find installed libcluon
-if(FOUND_CLUON)
-    message(STATUS "Libcluon: found at " ${FOUND_CLUON})
-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-msc
+if(CLUON_CMD)
+    message(STATUS "Libcluon: found at " ${CLUON_CMD})
+    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-complete.hpp
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${FOUND_CLUON} ${CMAKE_BINARY_DIR}/cluon-msc
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE} ${CMAKE_BINARY_DIR}/cluon-complete.hpp
-        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CMAKE_BINARY_DIR}/cluon-complete.cpp)
-else()
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CMAKE_BINARY_DIR}/cluon-complete.cpp
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE})
+else(CLUON_CMD)
 ################################################################################
 # Extract cluon-msc from cluon-complete.hpp.
     message(STATUS "Libcluon: not found - generating cluon-msc from header file")
-    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-msc
+    add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/cluon-complete.hpp
         WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE} ${CMAKE_BINARY_DIR}/cluon-complete.hpp
         COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CMAKE_BINARY_DIR}/cluon-complete.cpp
         COMMAND ${CMAKE_CXX_COMPILER} -o ${CMAKE_BINARY_DIR}/cluon-msc ${CMAKE_BINARY_DIR}/cluon-complete.cpp -std=c++14 -pthread -D HAVE_CLUON_MSC
-        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE}) 
-endif()
+        DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${CLUON_COMPLETE})
+    set(CLUON_CMD ${CMAKE_BINARY_DIR}/cluon-msc)
+endif(CLUON_CMD)
 
 
 ################################################################################
-# Generate opendlv-standard-message-set.{hpp,cpp} from ${OPENDLV_STANDARD_MESSAGE_SET} file.
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.cpp
+# Generate opendlv-standard-message-set.hpp from ${OPENDLV_STANDARD_MESSAGE_SET} file.
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_BINARY_DIR}/cluon-msc --cpp-sources --cpp-add-include-file=opendlv-standard-message-set.hpp --out=${CMAKE_BINARY_DIR}/opendlv-standard-message-set.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET}
-    COMMAND ${CMAKE_BINARY_DIR}/cluon-msc --cpp-headers --out=${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET} ${CMAKE_BINARY_DIR}/cluon-msc)
+    COMMAND ${CLUON_CMD} --cpp --out=${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENDLV_STANDARD_MESSAGE_SET} ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CLUON_CMD})
 
 ################################################################################
-# Generate openkorp-message-set.{hpp,cpp}.
-add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/openkorp-message-set.cpp
+# Generate openkorp-message-set.hpp 
+add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/openkorp-message-set.hpp
     WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
-    COMMAND ${CMAKE_BINARY_DIR}/cluon-msc --cpp-sources --cpp-add-include-file=openkorp-message-set.hpp --out=${CMAKE_BINARY_DIR}/openkorp-message-set.cpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENKORP_MESSAGE_SET}
-    COMMAND ${CMAKE_BINARY_DIR}/cluon-msc --cpp-headers --out=${CMAKE_BINARY_DIR}/openkorp-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENKORP_MESSAGE_SET}
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENKORP_MESSAGE_SET} ${CMAKE_BINARY_DIR}/cluon-msc)
+    COMMAND ${CLUON_CMD} --cpp --out=${CMAKE_BINARY_DIR}/openkorp-message-set.hpp ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENKORP_MESSAGE_SET}
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/src/${OPENKORP_MESSAGE_SET} ${CMAKE_BINARY_DIR}/cluon-complete.hpp ${CLUON_CMD})
+
+
 
 # Add current build directory as include directory as it contains generated files.
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
+# include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
 
 ################################################################################
 # Eigen
-find_package(Eigen3 REQUIRED )
-include_directories(${Eigen3_INCLUDE_DIRS})
+# find_package(Eigen3 REQUIRED)
+# include_directories(${Eigen3_INCLUDE_DIRS})
+# set(LIBRARIES ${LIBRARIES} ${Eigen3_LIBS})
 
 ################################################################################
 # Find ncurse
-find_package( Curses REQUIRED )
-include_directories( ${CURSES_INCLUDE_DIRS} )
+find_package(Curses REQUIRED)
+include_directories(${CURSES_INCLUDE_DIRS})
+set(LIBRARIES ${LIBRARIES} ${CURSES_LIBRARIES})
 
 ################################################################################
 # Gather all object code first to avoid double compilation.
-add_library(${PROJECT_NAME}-core OBJECT  ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.cpp ${CMAKE_BINARY_DIR}/openkorp-message-set.cpp src/DroneState.cpp)
-set(LIBRARIES Threads::Threads ${CURSES_LIBRARIES} ${Eigen3_LIBS})
+add_library(${PROJECT_NAME}-core OBJECT ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp ${CMAKE_BINARY_DIR}/openkorp-message-set.hpp)
+add_custom_target(generate_opendlv_standard_message_set_hpp DEPENDS ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp)
+add_custom_target(generate_openkorp_message_set_hpp DEPENDS ${CMAKE_BINARY_DIR}/openkorp-message-set.hpp)
+add_dependencies(${PROJECT_NAME}-core generate_opendlv_standard_message_set_hpp generate_openkorp_message_set_hpp)
 
 ################################################################################
 # Create executable.
 add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.cpp $<TARGET_OBJECTS:${PROJECT_NAME}-core>)
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
-
+add_dependencies(${PROJECT_NAME}-core generate_opendlv_standard_message_set_hpp)
 
 ################################################################################
 # Enable unit testing.
