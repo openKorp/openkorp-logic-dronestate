@@ -115,6 +115,7 @@ add_executable(${PROJECT_NAME} ${CMAKE_CURRENT_SOURCE_DIR}/src/${PROJECT_NAME}.c
     # $<TARGET_OBJECTS:${PROJECT_NAME}-core>
     ${CMAKE_BINARY_DIR}/opendlv-standard-message-set.hpp
     ${CMAKE_BINARY_DIR}/openkorp-message-set.hpp
+    ${CMAKE_CURRENT_SOURCE_DIR}/src/DroneState.cpp 
     )
 target_link_libraries(${PROJECT_NAME} ${LIBRARIES})
 # add_dependencies(${PROJECT_NAME}-core generate_opendlv_standard_message_set_hpp)
