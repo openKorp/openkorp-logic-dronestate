@@ -18,6 +18,7 @@
 
 #include <ncurses.h>
 #include <iostream>
+#include <chrono>
 
 #include "cluon-complete.hpp"
 #include "opendlv-standard-message-set.hpp"
@@ -67,7 +68,6 @@ int32_t main(int32_t argc, char **argv) {
   uint16_t const CID = std::stoi(commandlineArguments["cid"]);
   cluon::OD4Session od4{CID};
 
-  float const FREQ = std::stof(commandlineArguments["freq"]);
   
   if (VERBOSE == 2) {
     initscr();
@@ -81,23 +81,24 @@ int32_t main(int32_t argc, char **argv) {
         
       // od4.send(msg, cluon::time::now(), 0);
       test.setQuaternionState(msg);
-      if (VERBOSE == 2) {
-        mvprintw(1, 1, test.toString().c_str()); 
-        // mvprintw(2, 1, ebuffer); 
-        refresh();   
-      }
     }};
   
   od4.dataTrigger(openkorp::logic::Quaternion::ID(), onQuaternionMsg);
 
-  auto atFrequency{[]() -> bool
-  {
-    return true;
-  }};
   
+  auto timeStamp = std::chrono::high_resolution_clock::now();
 
-  od4.timeTrigger(FREQ, atFrequency);
-  
+  while (true) 
+  {
+
+    auto oldTimeStamp = timeStamp;
+    timeStamp = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> timeElapsed =  timeStamp - oldTimeStamp;
+
+    mvprintw(0, 0, test.toString().c_str()); 
+    mvprintw(3, 0, std::to_string(1/timeElapsed.count()).c_str()); 
+    refresh();   
+  }
   if (VERBOSE == 2) {
     endwin();
   }
