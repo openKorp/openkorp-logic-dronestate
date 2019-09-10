@@ -14,18 +14,20 @@
  *
  * You should have received a copy of the GNU General Public License
  * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301,
+ * USA.
  */
 
 #ifndef DRONESTATE_H
 #define DRONESTATE_H
 
+#include <array>
 #include <mutex>
-#include <vector>
 #include <string>
+#include <vector>
 #include "openkorp-message-set.hpp"
 
-class DroneState{
+class DroneState {
  private:
   DroneState(DroneState const &) = delete;
   DroneState(DroneState &&) = delete;
@@ -41,13 +43,13 @@ class DroneState{
   std::vector<double> quaternion2Euler(openkorp::logic::Quaternion const &);
   std::string toString();
 
+  std::array<float, 4> const getMotorState();
+  void setMotorState(std::array<float, 4>);
 
  private:
-
   openkorp::logic::Quaternion m_quaternionState;
+  std::array<float, 4> m_motorState;
   std::mutex m_quatMutex;
-
 };
-
 
 #endif
