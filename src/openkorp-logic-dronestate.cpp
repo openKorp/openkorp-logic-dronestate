@@ -16,6 +16,7 @@
  */
 
 #include <ncurses.h>
+#include <chrono>
 #include <iostream>
 
 #include "DroneState.hpp"
@@ -62,11 +63,17 @@ int32_t main(int32_t argc, char **argv) {
 
   od4.dataTrigger(openkorp::logic::Quaternion::ID(), onQuaternionMsg);
 
-  auto atFrequency{[&VERBOSE, &state]() -> bool {
+  auto timeStamp = std::chrono::high_resolution_clock::now();
+
+  auto atFrequency{[&VERBOSE, &state, &timeStamp]() -> bool {
+    auto newtimeStamp = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<double> timeElapsed = newtimeStamp - timeStamp;
     if (VERBOSE == 2) {
       mvprintw(0, 0, state.toString().c_str());
+      mvprintw(10, 0, std::to_string(1 / timeElapsed.count()).c_str());
       refresh();
     }
+    timeStamp = newtimeStamp;
     return true;
   }};
 
