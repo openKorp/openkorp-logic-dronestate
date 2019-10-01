@@ -22,6 +22,7 @@
 #define DRONESTATE_H
 
 #include <array>
+#include <eigen/Dense>
 #include <mutex>
 #include <string>
 #include <vector>
@@ -40,16 +41,40 @@ class DroneState {
 
   openkorp::logic::Quaternion const getQuaternionState();
   void setQuaternionState(openkorp::logic::Quaternion const &);
-  std::vector<double> quaternion2Euler(openkorp::logic::Quaternion const &);
+  Eigen::Vector3f quaternion2Euler(openkorp::logic::Quaternion const &);
   std::string toString();
-
   std::array<float, 4> const getMotorState();
-  void setMotorState(std::array<float, 4>);
+  void setMotorState(std::array<float, 4> const &);
+  void setInstruction(std::array<float, 4> const &);
+  void calcPID();
 
  private:
-  openkorp::logic::Quaternion m_quaternionState;
-  std::array<float, 4> m_motorState;
   std::mutex m_quatMutex;
+  openkorp::logic::Quaternion m_quaternionState;
+  // Motor 1,2,3,4
+  Eigen::Vector4f m_motorState;
+  // Instruction in
+  // roll     [rad]
+  // pitch    [rad]
+  // yaw      [rad/s]
+  // throttle [percent]
+  Eigen::Vector4f m_instruction;
+  // Gains in
+  // Roll
+  //  Kp Ki Kd
+  // Pitch
+  //  Kp Ki Kd
+  // Yaw
+  //  Kp Ki Kd
+  Eigen::Matrix3f m_gain;
+  // Error matrix
+  //    Current       Sum           Diff prev
+  //    Roll_error    Roll_error_i  Roll_error_d
+  //    Pitch_error   Pitch_error_i Pitch_error_d
+  //    Yaw_error     Yaw_error_i   Yaw_error_d
+  Eigen::Matrix3f m_error;
+
+  Eigen::Vector3f m_controlPid;
 };
 
 #endif

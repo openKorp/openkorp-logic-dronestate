@@ -67,10 +67,30 @@ int32_t main(int32_t argc, char **argv) {
 
   auto atFrequency{[&VERBOSE, &state, &timeStamp]() -> bool {
     auto newtimeStamp = std::chrono::high_resolution_clock::now();
+
+    // 3. Translate received data into usable values
+    // getFlightInstruction(); Done
+
+    // 4. Calculate errors comparing received instruction with measures
+    // calculateErrors(); Done
+
+    // if (isStarted()) {
+    // 5. Calculate motors speed with PID controller
+    // pidController(); Done
+
+    // compensateBatteryDrop();
+
+    // 6. Apply motors speed
+    // applyMotorSpeed();
+
     std::chrono::duration<double> timeElapsed = newtimeStamp - timeStamp;
+    state.calcPID();
+
     if (VERBOSE == 2) {
-      mvprintw(0, 0, state.toString().c_str());
-      mvprintw(10, 0, std::to_string(1 / timeElapsed.count()).c_str());
+      mvprintw(
+          0, 0,
+          ("Loop freq: " + std::to_string(1 / timeElapsed.count())).c_str());
+      mvprintw(1, 0, state.toString().c_str());
       refresh();
     }
     timeStamp = newtimeStamp;

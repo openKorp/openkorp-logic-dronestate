@@ -88,7 +88,7 @@ add_custom_command(OUTPUT ${CMAKE_BINARY_DIR}/openkorp-message-set.hpp
 # Add current build directory as include directory as it contains generated files.
 include_directories(SYSTEM ${CMAKE_BINARY_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
-# include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty)
 
 ################################################################################
 # Eigen
