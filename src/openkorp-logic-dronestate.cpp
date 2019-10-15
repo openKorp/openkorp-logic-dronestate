@@ -84,7 +84,7 @@ int32_t main(int32_t argc, char **argv) {
     // applyMotorSpeed();
 
     std::chrono::duration<double> timeElapsed = newtimeStamp - timeStamp;
-    state.calcPID();
+    // state.calcPID();
 
     if (VERBOSE == 2) {
       mvprintw(

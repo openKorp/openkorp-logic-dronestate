@@ -153,18 +153,22 @@ void DroneState::setInstruction(std::array<float, 4> const &a_instruction) {
 }
 
 void DroneState::calcPID() {
-  // if controller not active, dont do anything
-  if (!(m_instruction(4) > 0)) {
-    return;
-  }
+  //   if controller not active, dont do anything
+  if (m_instruction(3) <= 0) return;
   std::lock_guard<std::mutex> lock(m_quatMutex);
+  //   save previous error values
   Eigen::Vector3f previousError;
-  previousError << m_error.col(1);
-  m_error.col(2) = (m_error.col(2) + m_error.col(1)).eval();
-  m_error.col(1) =
+  previousError << m_error.col(0);
+  //   integral error
+  m_error.col(1) = (m_error.col(1) + m_error.col(0)).eval();
+  //   new current error values
+  m_error.col(0) =
       m_instruction.head<3>() - quaternion2Euler(m_quaternionState);
-  m_error.col(3) = m_error.col(1) - previousError;
+  //   derivative error
+  m_error.col(2) = m_error.col(1) - previousError;
 
+  // calculate control signal
   m_controlPid = (m_gain.array() * m_error.array()).rowwise().sum();
-  // return;
+
+  //   m_motorState =
 }

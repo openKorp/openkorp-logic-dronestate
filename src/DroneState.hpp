@@ -51,7 +51,7 @@ class DroneState {
  private:
   std::mutex m_quatMutex;
   openkorp::logic::Quaternion m_quaternionState;
-  // Motor 1,2,3,4
+  // Motor esc signal 1,2,3,4
   Eigen::Vector4f m_motorState;
   // Instruction in
   // roll     [rad]
